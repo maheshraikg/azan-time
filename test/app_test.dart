@@ -230,6 +230,19 @@ void main() {
       await tester.pump(const Duration(seconds: 10));
       expect(find.text('IQAMA'), findsOneWidget);
     }
+    // ...but a dot, a tap or a swipe still switches the page by hand.
+    await tester.tap(find.byKey(const ValueKey('page-dot-times')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 700));
+    expect(find.text('IQAMA'), findsNothing);
+    await tester.fling(find.byType(DisplayScreen), const Offset(-400, 0), 1000);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 700));
+    expect(find.text('IQAMA'), findsOneWidget);
+    await tester.tapAt(const Offset(500, 300));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 700));
+    expect(find.text('Please switch off your phones'), findsOneWidget);
     await _dispose(tester);
   });
 

@@ -57,6 +57,22 @@ class _DisplayScreenState extends State<DisplayScreen> {
   int _seconds = 0;
   bool _wakeChecked = false;
 
+  /// A page picked by hand (swipe, tap or dot), shown for a minute, even
+  /// over the Iqama countdown; then the pages rotate again.
+  String? _picked;
+  int _pickedAt = 0;
+
+  void _show(String page) => setState(() {
+    _picked = page;
+    _pickedAt = _seconds;
+  });
+
+  void _step(List<String> pages, String current, int delta) {
+    if (pages.length < 2) return;
+    final i = pages.indexOf(current);
+    _show(pages[(i + delta) % pages.length]);
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -103,7 +119,11 @@ class _DisplayScreenState extends State<DisplayScreen> {
     final soon =
         next != null && next.at.difference(now) <= const Duration(minutes: 5);
     final String page;
-    if (waitingIqama != null || soon) {
+    if (_picked != null &&
+        pages.contains(_picked) &&
+        _seconds - _pickedAt < 60) {
+      page = _picked!;
+    } else if (waitingIqama != null || soon) {
       page = settings.displayNextPage ? 'next' : 'times';
     } else {
       page =
@@ -117,6 +137,14 @@ class _DisplayScreenState extends State<DisplayScreen> {
       backgroundColor: const Color(0xFF06261D),
       body: GestureDetector(
         onLongPress: () => Navigator.pop(context),
+        // Tap or swipe to change the page by hand.
+        onTap: () => _step(pages, page, 1),
+        onHorizontalDragEnd: (d) {
+          final v = d.primaryVelocity ?? 0;
+          if (v.abs() < 200) return;
+          final rtl = Directionality.of(context) == TextDirection.rtl;
+          _step(pages, page, (v < 0) != rtl ? 1 : -1);
+        },
         child: DecoratedBox(
           decoration: BoxDecoration(gradient: heroGradient(Brightness.dark)),
           child: CustomPaint(
@@ -395,17 +423,33 @@ class _DisplayScreenState extends State<DisplayScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       for (final p in pages)
-                                        Container(
-                                          width: unit * 0.12,
-                                          height: unit * 0.12,
-                                          margin: EdgeInsets.symmetric(
-                                            horizontal: unit * 0.06,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: p == page
-                                                ? gold
-                                                : fg.withValues(alpha: 0.25),
+                                        GestureDetector(
+                                          key: ValueKey('page-dot-$p'),
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () => _show(p),
+                                          // A finger-sized target.
+                                          child: Padding(
+                                            padding: EdgeInsets.all(
+                                              unit * 0.12,
+                                            ),
+                                            child: AnimatedContainer(
+                                              duration: const Duration(
+                                                milliseconds: 250,
+                                              ),
+                                              width: p == page
+                                                  ? unit * 0.42
+                                                  : unit * 0.18,
+                                              height: unit * 0.18,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(unit),
+                                                color: p == page
+                                                    ? gold
+                                                    : fg.withValues(
+                                                        alpha: 0.35,
+                                                      ),
+                                              ),
+                                            ),
                                           ),
                                         ),
                                     ],
