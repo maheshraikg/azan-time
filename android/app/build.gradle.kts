@@ -21,7 +21,7 @@ android {
     defaultConfig {
         // Own id for Azan Time: installs cleanly next to any old "Waqt" test
         // build signed with another key.
-        applicationId = "com.maheshrai.azantime"
+        applicationId = "com.azantime.app"
         // Android 7.0+: DND access and battery-optimisation APIs.
         minSdk = maxOf(flutter.minSdkVersion, 24)
         targetSdk = flutter.targetSdkVersion

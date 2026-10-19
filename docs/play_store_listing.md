@@ -1,5 +1,8 @@
 # Play Store listing — Azan Time
 
+## Package name (permanent)
+com.azantime.app – store link: https://play.google.com/store/apps/details?id=com.azantime.app
+
 ## App name (max 30)
 Azan Time: Namaz Prayer Times
 
