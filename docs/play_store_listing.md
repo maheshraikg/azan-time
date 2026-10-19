@@ -90,6 +90,36 @@ hijri, dua, tasbih, kerala, malayalam, kannada
 ## Content rating
 Everyone
 
+## Store graphics (docs/store/)
+• App icon 512×512: docs/store/icon-512.png
+• Feature graphic 1024×500: docs/store/feature-graphic-1024x500.png
+
+## Privacy policy URL
+https://maheshraikg.github.io/azan-time/privacy.html
+(Turn on GitHub Pages once: repository Settings → Pages → Source "Deploy from a
+branch" → Branch `main`, folder `/docs` → Save.)
+
+## Play Console declarations (App content)
+• Foreground service – type "special use": keeps the next-prayer notification
+  (time and countdown) always shown, which the user can turn off in Settings.
+  Also "media playback": plays the Azan.
+• Exact alarms (SCHEDULE_EXACT_ALARM): the Azan must sound at the exact prayer
+  time; this is the app's core function (alarm/clock-like).
+• Full-screen intent (USE_FULL_SCREEN_INTENT): shows the Azan over the lock
+  screen at prayer time, like an alarm clock.
+• Location: used on the device only for prayer times and Qibla.
+• Ads: No. Target audience: everyone (not designed for children).
+
+## Upload
+1. Add the 4 upload-key secrets in GitHub (Settings → Secrets and variables →
+   Actions): UPLOAD_KEYSTORE_BASE64, UPLOAD_KEYSTORE_PASSWORD,
+   UPLOAD_KEY_ALIAS, UPLOAD_KEY_PASSWORD.
+2. Push or run the "Build APK" workflow (Actions → Build APK → Run workflow).
+3. Download azan-time.aab from the apk-latest release.
+4. Play Console → Create app → Testing → Closed testing (12 testers, 14 days
+   for new personal accounts) → upload azan-time.aab, with Play App Signing on.
+5. After the test period: Production → upload the newest .aab.
+
 ## Before publishing
 • Have a scholar check the Arabic of the duas and Ayat al-Kursi
   (lib/core/duas.dart)

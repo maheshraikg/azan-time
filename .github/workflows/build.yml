@@ -42,6 +42,28 @@ jobs:
       - name: Build per-architecture APKs
         run: flutter build apk --release --split-per-abi --build-number=${{ github.run_number }}
 
+      # Play Store bundle, signed with your upload key from the repository
+      # secrets (the test APKs above keep the test key, so they still install
+      # over earlier test builds). Skipped until the secrets are added.
+      - name: Build Play Store bundle (.aab)
+        env:
+          KS: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KS" ]; then
+            echo "No upload key secrets: Play Store bundle skipped." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "$KS" | base64 -d > android/app/upload-keystore.jks
+          printf 'storeFile=upload-keystore.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$KS_PASS" "$KEY_ALIAS" "$KEY_PASS" > android/key.properties
+          flutter build appbundle --release --build-number=${{ github.run_number }}
+          rm -f android/key.properties android/app/upload-keystore.jks
+          cp build/app/outputs/bundle/release/app-release.aab azan-time.aab
+          echo "Play Store bundle: azan-time.aab (version code ${{ github.run_number }})" >> "$GITHUB_STEP_SUMMARY"
+
       - name: APK size
         run: |
           ls -l waqt.apk build/app/outputs/flutter-apk/
@@ -66,7 +88,8 @@ jobs:
           cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk waqt-arm64.apk
           cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk waqt-arm32.apk
           gh release delete apk-latest --cleanup-tag --yes || true
-          gh release create apk-latest waqt.apk waqt-arm64.apk waqt-arm32.apk \
+          extra=""; [ -f azan-time.aab ] && extra="azan-time.aab"
+          gh release create apk-latest waqt.apk waqt-arm64.apk waqt-arm32.apk $extra \
             --target "$SHA" \
             --title "Azan Time – latest test build" \
             --notes "Latest Azan Time APK built from ${SHA:0:7}. For testing; signed with the fixed test key, so it installs over earlier test builds signed with it."
