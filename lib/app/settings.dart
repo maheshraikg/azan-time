@@ -346,6 +346,20 @@ class AppSettings extends ChangeNotifier {
         );
       } catch (_) {}
     }
+    // Once: the old untouched defaults (Iqama +15, Imsak 10 min) become the
+    // original app's (+20, 15 min). Times the user set stay as they are.
+    if (p.getBool('originalDefaults') != true) {
+      for (final pr in const [Prayer.dhuhr, Prayer.asr, Prayer.isha]) {
+        final a = alerts.of(pr);
+        if (a.iqamaDelay == 15 && a.fixedIqama == null) {
+          alerts = alerts.withPrayer(pr, a.copyWith(iqamaDelay: 20));
+        }
+      }
+      if (imsakMinutes == 10) imsakMinutes = 15;
+      p.setBool('originalDefaults', true);
+      if (al != null) p.setString('alerts', jsonEncode(alerts.toJson()));
+      p.setInt('imsak', imsakMinutes);
+    }
     final mj = p.getString('masjids');
     if (mj != null) {
       try {
