@@ -215,7 +215,7 @@ class SettingsScreen extends StatelessWidget {
                   TextButton(
                     onPressed: () => settings.update((x) {
                       x.adjustments = {};
-                      x.imsakMinutes = 10;
+                      x.imsakMinutes = 15;
                       x.ishraqMinutes = 15;
                     }),
                     child: Text(s.reset),

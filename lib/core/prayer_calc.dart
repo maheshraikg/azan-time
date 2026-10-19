@@ -218,7 +218,7 @@ class CalcParams {
     this.asr = AsrMethod.shafii,
     this.highLatitude = HighLatitudeRule.automatic,
     this.adjustments = const {},
-    this.imsakMinutesBeforeFajr = 10,
+    this.imsakMinutesBeforeFajr = 15,
     this.ishraqMinutesAfterSunrise = 15,
     this.fixedTimes = const {},
   });

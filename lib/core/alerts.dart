@@ -69,7 +69,7 @@ class PrayerAlert {
   const PrayerAlert({
     this.azan = true,
     this.iqama = true,
-    this.iqamaDelay = 15,
+    this.iqamaDelay = 20,
     this.reminderMinutes = 0,
     this.fixedIqama,
   });
@@ -131,7 +131,8 @@ class AlertConfig {
   const AlertConfig({
     this.prayers = defaultPrayerAlerts,
     this.jumuahIqamaDelay = 30,
-    this.jumuahFixedIqama,
+    // As the original app: Jumu'ah Iqama at 1:00 PM.
+    this.jumuahFixedIqama = 13 * 60,
     this.silentEnabled = false,
     this.silentMode = SilentMode.vibrate,
     this.silentMinutesAfterIqama = 20,
@@ -233,10 +234,10 @@ class AlertConfig {
 
   static const Map<Prayer, PrayerAlert> defaultPrayerAlerts = {
     Prayer.fajr: PrayerAlert(iqamaDelay: 20),
-    Prayer.dhuhr: PrayerAlert(iqamaDelay: 15),
-    Prayer.asr: PrayerAlert(iqamaDelay: 15),
+    Prayer.dhuhr: PrayerAlert(iqamaDelay: 20),
+    Prayer.asr: PrayerAlert(iqamaDelay: 20),
     Prayer.maghrib: PrayerAlert(iqamaDelay: 5),
-    Prayer.isha: PrayerAlert(iqamaDelay: 15),
+    Prayer.isha: PrayerAlert(iqamaDelay: 20),
   };
 
   PrayerAlert of(Prayer p) =>
@@ -327,7 +328,8 @@ class AlertConfig {
   Map<String, dynamic> toJson() => {
     'prayers': {for (final e in prayers.entries) e.key.name: e.value.toJson()},
     'jumuahDelay': jumuahIqamaDelay,
-    if (jumuahFixedIqama != null) 'jumuahFixed': jumuahFixedIqama,
+    // Written even when cleared, so "no fixed time" stays cleared.
+    'jumuahFixed': jumuahFixedIqama,
     'silent': silentEnabled,
     'silentMode': silentMode.name,
     'silentAfter': silentMinutesAfterIqama,
@@ -371,7 +373,9 @@ class AlertConfig {
               : d.of(pr),
       },
       jumuahIqamaDelay: j['jumuahDelay'] as int? ?? d.jumuahIqamaDelay,
-      jumuahFixedIqama: j['jumuahFixed'] as int?,
+      jumuahFixedIqama: j.containsKey('jumuahFixed')
+          ? j['jumuahFixed'] as int?
+          : 13 * 60,
       silentEnabled: j['silent'] as bool? ?? d.silentEnabled,
       silentMode:
           SilentMode.values.asNameMap()[j['silentMode']] ?? d.silentMode,

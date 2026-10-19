@@ -89,7 +89,7 @@ class AppSettings extends ChangeNotifier {
   AsrMethod asr = AsrMethod.shafii;
   HighLatitudeRule highLatitude = HighLatitudeRule.automatic;
   Map<Prayer, int> adjustments = {};
-  int imsakMinutes = 10;
+  int imsakMinutes = 15;
   int ishraqMinutes = 15;
 
   /// Angles of the Custom Method.
@@ -322,7 +322,7 @@ class AppSettings extends ChangeNotifier {
         };
       } catch (_) {}
     }
-    imsakMinutes = p.getInt('imsak') ?? 10;
+    imsakMinutes = p.getInt('imsak') ?? 15;
     ishraqMinutes = p.getInt('ishraq') ?? 15;
     customFajr = p.getDouble('customFajr') ?? 18;
     customIsha = p.getDouble('customIsha') ?? 17;

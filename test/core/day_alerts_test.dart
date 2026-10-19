@@ -20,7 +20,7 @@ void main() {
       }
       expect(
         d[Prayer.fajr].difference(d[Prayer.imsak]),
-        const Duration(minutes: 10),
+        const Duration(minutes: 15),
       );
       expect(
         d[Prayer.ishraq].difference(d[Prayer.sunrise]),
@@ -94,7 +94,12 @@ void main() {
 
     test("Jumu'ah uses its own Iqama delay", () {
       final friday = days[1];
-      final plan = planAlerts(days, const AlertConfig(), start);
+      // Without the default fixed 1:00 PM Jumu'ah Iqama.
+      final plan = planAlerts(
+        days,
+        const AlertConfig(jumuahFixedIqama: null),
+        start,
+      );
       final iq = plan.firstWhere(
         (a) =>
             a.kind == AlertKind.iqama && a.prayer == Prayer.dhuhr && a.friday,
@@ -108,7 +113,7 @@ void main() {
       );
       expect(
         thuIq.at.difference(days[0][Prayer.dhuhr]),
-        const Duration(minutes: 15),
+        const Duration(minutes: 20),
       );
     });
 
@@ -138,7 +143,7 @@ void main() {
     });
 
     test('silent windows run Azan → Iqama + N and merge overlaps', () {
-      const config = AlertConfig(silentEnabled: true);
+      const config = AlertConfig(silentEnabled: true, jumuahFixedIqama: null);
       final w = planSilent(days, config, start);
       expect(w.length, 15);
       final first = w.first;
@@ -186,7 +191,7 @@ void main() {
       // 04:00 is before Fajr Azan: falls back to the delay.
       expect(
         iqamaTime(thu, Prayer.fajr, c).difference(thu[Prayer.fajr]),
-        const Duration(minutes: 15),
+        const Duration(minutes: 20),
       );
       final plan = planAlerts(days, c, start);
       expect(
@@ -223,5 +228,18 @@ void main() {
       expect(r.of(Prayer.isha).iqamaDelay, 25);
       expect(r.of(Prayer.fajr).iqamaDelay, 20);
     });
+  });
+
+  test("Iqama defaults as the original app: 20/20/20/5/20, Jumu'ah 1 PM", () {
+    const c = AlertConfig();
+    expect(
+      [for (final p in Prayer.fard) c.of(p).iqamaDelay],
+      [20, 20, 20, 5, 20],
+    );
+    expect(c.jumuahFixedIqama, 13 * 60);
+    final back = AlertConfig.fromJson(
+      const AlertConfig(jumuahFixedIqama: null).toJson(),
+    );
+    expect(back.jumuahFixedIqama, isNull, reason: 'cleared stays cleared');
   });
 }
