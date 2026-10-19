@@ -130,6 +130,7 @@ void main() {
           child: AppScope(
             settings: settings,
             child: MaterialApp(
+              debugShowCheckedModeBanner: false,
               theme: buildTheme(Brightness.light),
               home: const AlertsScreen(),
             ),
@@ -169,6 +170,7 @@ void main() {
         child: AppScope(
           settings: settingsFor(Lang.en),
           child: MaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: buildTheme(Brightness.light),
             home: const DisplayScreen(keepAwake: false),
           ),
@@ -197,6 +199,7 @@ void main() {
         child: AppScope(
           settings: settings,
           child: MaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: buildTheme(Brightness.light),
             home: DisplayScreen(keepAwake: false, clock: () => now),
           ),
@@ -231,7 +234,11 @@ void main() {
       key: key,
       child: AppScope(
         settings: settings,
-        child: MaterialApp(theme: buildTheme(Brightness.light), home: home),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: buildTheme(Brightness.light),
+          home: home,
+        ),
       ),
     );
     await tester.pumpWidget(wrap(const AlertsScreen()));
@@ -264,7 +271,11 @@ void main() {
       key: key,
       child: AppScope(
         settings: settings,
-        child: MaterialApp(theme: buildTheme(Brightness.light), home: home),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: buildTheme(Brightness.light),
+          home: home,
+        ),
       ),
     );
     await tester.pumpWidget(wrap(const TrackerScreen()));
@@ -292,12 +303,20 @@ void main() {
         child: AppScope(
           settings: settings,
           child: MaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: buildTheme(Brightness.light),
             home: ShareScreen(date: settings.today),
           ),
         ),
       ),
     );
+    await tester.runAsync(
+      () => precacheImage(
+        const AssetImage('assets/app_icon.png'),
+        tester.element(find.byType(PrayerPoster)),
+      ),
+    );
+    await tester.pump();
     await shot(tester, key, 'en_12_share');
     // Small phone, large text.
     await tester.binding.setSurfaceSize(const Size(360, 720));
@@ -307,6 +326,7 @@ void main() {
         child: AppScope(
           settings: settings..lang = Lang.kn,
           child: MaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: buildTheme(Brightness.light),
             builder: (context, child) => MediaQuery(
               data: MediaQuery.of(context)
@@ -328,6 +348,7 @@ void main() {
           child: AppScope(
             settings: settings,
             child: MaterialApp(
+              debugShowCheckedModeBanner: false,
               theme: buildTheme(Brightness.light),
               home: Scaffold(
                 body: Center(
@@ -411,6 +432,7 @@ void main() {
           child: AppScope(
             settings: settings,
             child: MaterialApp(
+              debugShowCheckedModeBanner: false,
               theme: buildTheme(Brightness.light),
               home: screen,
             ),

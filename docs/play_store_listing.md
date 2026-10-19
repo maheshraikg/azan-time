@@ -72,14 +72,10 @@ Lifestyle (or Books & Reference)
 azan, adhan, namaz, salah, prayer times, qibla, ramadan, islamic calendar,
 hijri, dua, tasbih, kerala, malayalam, kannada
 
-## Screenshots (phone, from docs/screenshots)
-1. en_1_today.png – Today with the animated sky
-2. en_12_share.png – Share poster
-3. en_2b_calendar.png – Hijri month calendar
-4. en_13_duas.png – Duas & Azkar
-5. en_14_ramadan.png – Ramadan timetable
-6. en_3_qibla.png – Qibla
-7. kn_12_share_small.png / ml_1_today.png – other languages
+## Screenshots (phone, 1080×1920, docs/store/screenshots/)
+Upload all 7 in this order (made by tool/store_screenshots.py):
+1_1_today, 2_12_share, 3_2b_calendar, 4_13_duas, 5_14_ramadan, 6_3_qibla,
+7_5_alerts
 
 ## Data safety form
 • Data collected: none
