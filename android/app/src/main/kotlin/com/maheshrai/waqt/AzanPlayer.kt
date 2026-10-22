@@ -165,10 +165,9 @@ class AzanReceiver : BroadcastReceiver() {
     }
 }
 
-/** Plays one Azan in the foreground (a short service), with Stop in its notification. */
+/** Plays one Azan in the foreground, with Stop in its notification. */
 class AzanService : Service() {
     private var player: MediaPlayer? = null
-    private var notification: Notification? = null
 
     /** A preview from the settings: leaves no notification behind. */
     private var preview = false
@@ -195,8 +194,11 @@ class AzanService : Service() {
         val volume = intent?.getIntExtra(EXTRA_VOLUME, 0) ?: 0
         preview = intent?.getBooleanExtra(EXTRA_PREVIEW, false) == true
         val notification = buildNotification(this, title, body, intent?.getBooleanExtra(EXTRA_FULL, false) == true)
-        this.notification = notification
-        holdForeground()
+        if (Build.VERSION.SDK_INT >= 29) {
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
         releasePlayer()
         if (AzanScheduler.vibrate(this)) vibrate()
         if (shouldPlaySound()) {
@@ -208,42 +210,7 @@ class AzanService : Service() {
         }
         handler.removeCallbacksAndMessages(TIMEOUT_TOKEN)
         handler.postAtTime({ stopAll() }, TIMEOUT_TOKEN, android.os.SystemClock.uptimeMillis() + MAX_PLAY_MS)
-        handler.removeCallbacksAndMessages(EXTEND_TOKEN)
-        extendLater()
         return START_NOT_STICKY
-    }
-
-    /**
-     * Foreground as a short service (Android 14+): no special permission
-     * or Play declaration, about 3 minutes each time it is (re)started.
-     */
-    private fun holdForeground() {
-        val n = notification ?: return
-        if (Build.VERSION.SDK_INT >= 34) {
-            startForeground(NOTIFICATION_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE)
-        } else {
-            startForeground(NOTIFICATION_ID, n)
-        }
-    }
-
-    /** A long Azan (own file): renew the 3 minutes while it may be renewed. */
-    private fun extendLater() {
-        if (Build.VERSION.SDK_INT < 34) return
-        handler.postAtTime({
-            if (player != null) {
-                try {
-                    holdForeground()
-                } catch (e: Exception) {
-                    // Not allowed now (app not visible): ends at the timeout.
-                }
-                extendLater()
-            }
-        }, EXTEND_TOKEN, android.os.SystemClock.uptimeMillis() + EXTEND_MS)
-    }
-
-    /** The short-service time is up: stop the sound in time. */
-    override fun onTimeout(startId: Int) {
-        stopAll()
     }
 
     private fun shouldPlaySound(): Boolean {
@@ -436,8 +403,6 @@ class AzanService : Service() {
         private const val NOTIFICATION_ID = 7001
         private const val MAX_PLAY_MS = 6 * 60 * 1000L
         private val TIMEOUT_TOKEN = Any()
-        private val EXTEND_TOKEN = Any()
-        private const val EXTEND_MS = 150 * 1000L
 
         fun rawUri(context: Context, sound: String): Uri {
             val id = when (sound) {
