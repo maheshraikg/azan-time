@@ -99,9 +99,9 @@ https://maheshraikg.github.io/azan-time/privacy.html
 branch" → Branch `main`, folder `/docs` → Save.)
 
 ## Play Console declarations (App content)
-• Foreground service – type "special use": keeps the next-prayer notification
-  (time and countdown) always shown, which the user can turn off in Settings.
-  Also "media playback": plays the Azan.
+• Foreground service: only the "short service" type (plays the Azan), which
+  needs no foreground-service declaration or video. The next-prayer
+  notification is a normal ongoing notification, not a service.
 • Exact alarms (SCHEDULE_EXACT_ALARM): the Azan must sound at the exact prayer
   time; this is the app's core function (alarm/clock-like).
 • Full-screen intent (USE_FULL_SCREEN_INTENT): shows the Azan over the lock

@@ -5,10 +5,8 @@
     <!-- Azan/Iqama on time and auto-silent; the user grants it in settings. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <!-- Azan player (AzanPlayer.kt). -->
+    <!-- Azan player (AzanPlayer.kt), a short service: no type permission. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -103,13 +101,7 @@
             </intent-filter>
         </receiver>
         <service android:name=".AzanService" android:exported="false"
-            android:foregroundServiceType="mediaPlayback" />
-        <!-- Keeps the next-prayer notification shown (StatusNotifier.kt). -->
-        <service android:name=".StatusService" android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Always-on next prayer time and countdown the user turned on" />
-        </service>
+            android:foregroundServiceType="shortService" />
         <activity android:name=".AzanActivity" android:exported="false"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
